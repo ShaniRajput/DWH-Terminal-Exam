@@ -1,0 +1,43 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn import metrics
+from sklearn import tree
+
+data = pd.read_csv('Medicine Dataset.csv')
+data.head()
+
+print("Number of Rows: ",len(data.axes[0]))
+print("Number of Column: ",len(data.axes[1]))
+print(data.shape)
+
+feature = data.drop(columns='Medicine')
+feature.head()
+
+data_class = data['Medicine']
+data_class.head()
+
+feature['Cholesterol'] = feature['Cholesterol'].astype('category')
+feature['gender'] = feature['gender'].astype('category')
+feature['blood_pressure'] = feature['blood_pressure'].astype('category')
+
+feature['Cholesterol'] = feature.Cholesterol.cat.codes
+feature['gender'] = feature.gender.cat.codes
+feature['blood_pressure'] = feature.blood_pressure.cat.codes
+
+
+feature = feature.drop(columns='blood pressure')
+
+feature.head()
+
+x_train, x_test, y_train, y_test = train_test_split(feature, data_class, test_size=0.2, random_state=1)
+
+dt_clf = DecisionTreeClassifier(criterion="entropy", max_depth=5)
+dt_clf = dt_clf.fit(x_train,y_train)
+y_pred = dt_clf.predict(x_test)
+
+print("Accuracy:", round(metrics.accuracy_score(y_test, y_pred) * 100, 2))
+print('\nClassificaion Report:\n')
+print(metrics.classification_report(y_pred, y_test))
+
+tree.plot_tree(dt_clf)
